@@ -22,9 +22,7 @@ async function fetchImages(requestText, page, perPage) {
   const response = await axios.get(`?${parameters}`);
 
     if (!response.data.totalHits) {
-        return Promise.reject(
-          new Error(`Зображень за запитом "${requestText}" не знайдено!`)
-        );
+        return Promise.reject(new Error(`No images found for "${requestText}"!`));
     }
     
   return response.data.hits;

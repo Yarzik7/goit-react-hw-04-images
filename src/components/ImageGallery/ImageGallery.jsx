@@ -8,7 +8,7 @@ import { Section } from 'components/Section/Section';
 import { Button } from 'components/Button/Button';
 
 class ImageGallery extends Component {
-  state = { images: [], error: null, status: 'idle', page: 1, perPage: 12 };
+  state = { images: [], error: null, status: 'idle', page: 1, perPage: 12, responseLength: 0 };
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.query;
@@ -22,7 +22,7 @@ class ImageGallery extends Component {
     if (prevQuery !== nextQuery) {
       this.setState({ status: 'pending', images: [], page: 1 });
       fetchImages(nextQuery, 1, perPage)
-        .then(images => this.setState({ images, status: 'resolved' }))
+        .then(images => this.setState({ images, status: 'resolved', responseLength: images.length }))
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
 
@@ -30,7 +30,11 @@ class ImageGallery extends Component {
       this.setState({ status: 'pending' });
       fetchImages(nextQuery, nextPage, perPage)
         .then(nextImages =>
-          this.setState(({ images: prevImages }) => ({ images: [...prevImages, ...nextImages], status: 'resolved' }))
+          this.setState(({ images: prevImages }) => ({
+            images: [...prevImages, ...nextImages],
+            status: 'resolved',
+            responseLength: nextImages.length,
+          }))
         )
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
@@ -51,7 +55,7 @@ class ImageGallery extends Component {
   );
 
   render() {
-    const { images, error, status } = this.state;
+    const { images, error, status, perPage, responseLength } = this.state;
 
     if (status === 'idle') {
       return (
@@ -66,7 +70,7 @@ class ImageGallery extends Component {
         <Section>
           <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
           <Loader />
-          {images.length && <Button countPage={this.countPage} />}
+          {responseLength === perPage && <Button countPage={this.countPage} />}
         </Section>
       );
     }
@@ -74,7 +78,9 @@ class ImageGallery extends Component {
     if (status === 'rejected') {
       return (
         <Section>
+          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
           <Error message={error.message} />
+          {responseLength === perPage && <Button countPage={this.countPage} />}
         </Section>
       );
     }
@@ -83,7 +89,7 @@ class ImageGallery extends Component {
       return (
         <Section>
           <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
-          {images.length && <Button countPage={this.countPage} />}
+          {responseLength === perPage && <Button countPage={this.countPage} />}
         </Section>
       );
     }

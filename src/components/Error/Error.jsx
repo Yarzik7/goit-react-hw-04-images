@@ -1,5 +1,7 @@
+import { ErrorMessage } from "./Error.styled";
+
 const Error = ({message}) => {
-    return (<div>{message }</div>)
+    return (<ErrorMessage>{message}</ErrorMessage>)
 }
 
 export {Error};
