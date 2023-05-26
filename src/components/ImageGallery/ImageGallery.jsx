@@ -5,11 +5,10 @@ import { Loader } from 'components/Loader/Loader';
 import { Error } from 'components/Error/Error';
 import { Greeting, ImageGalleryBox } from './ImageGallery.styled';
 import { Section } from 'components/Section/Section';
-import { Container } from 'components/Section/Container/Container';
 import { Button } from 'components/Button/Button';
 
 class ImageGallery extends Component {
-  state = { images: [], error: null, status: 'idle', page: 1 };
+  state = { images: [], error: null, status: 'idle', page: 1, perPage: 12 };
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.query;
@@ -18,17 +17,21 @@ class ImageGallery extends Component {
     const prevPage = prevState.page;
     const nextPage = this.state.page;
 
+    const perPage = this.state.perPage;
+
     if (prevQuery !== nextQuery) {
       this.setState({ status: 'pending', images: [], page: 1 });
-      fetchImages(nextQuery, 1, 12)
+      fetchImages(nextQuery, 1, perPage)
         .then(images => this.setState({ images, status: 'resolved' }))
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
 
-      if (prevPage < nextPage) {
-        this.setState({ status: 'pending'});
-      fetchImages(nextQuery, nextPage, 12)
-        .then(nextImages => this.setState(({ images: prevImages }) => ({images: [...prevImages, ...nextImages], status: 'resolved',})))
+    if (prevPage < nextPage) {
+      this.setState({ status: 'pending' });
+      fetchImages(nextQuery, nextPage, perPage)
+        .then(nextImages =>
+          this.setState(({ images: prevImages }) => ({ images: [...prevImages, ...nextImages], status: 'resolved' }))
+        )
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
@@ -53,11 +56,7 @@ class ImageGallery extends Component {
     if (status === 'idle') {
       return (
         <Section>
-          <Container>
-            <Greeting>
-              Hello! Please enter the topic you would like to search images for
-            </Greeting>
-          </Container>
+          <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>
         </Section>
       );
     }
@@ -65,11 +64,9 @@ class ImageGallery extends Component {
     if (status === 'pending') {
       return (
         <Section>
-          <Container>
-            <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
-            <Loader />
-            {images.length && <Button countPage={this.countPage} />}
-          </Container>
+          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
+          <Loader />
+          {images.length && <Button countPage={this.countPage} />}
         </Section>
       );
     }
@@ -77,9 +74,7 @@ class ImageGallery extends Component {
     if (status === 'rejected') {
       return (
         <Section>
-          <Container>
-            <Error message={error.message} />
-          </Container>
+          <Error message={error.message} />
         </Section>
       );
     }
@@ -87,12 +82,8 @@ class ImageGallery extends Component {
     if (status === 'resolved') {
       return (
         <Section>
-          <Container>
-            <ImageGalleryBox>
-              {images && images.map(this.mapImages)}
-            </ImageGalleryBox>
-            {images.length && <Button countPage={this.countPage} />}
-          </Container>
+          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
+          {images.length && <Button countPage={this.countPage} />}
         </Section>
       );
     }

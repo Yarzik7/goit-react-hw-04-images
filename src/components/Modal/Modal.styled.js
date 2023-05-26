@@ -14,14 +14,14 @@ const Overlay = styled.div`
 `;
 
 const ModalImageBox = styled.div`
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 24px);
+  width: 65%;
+  height: auto;
 `;
 
-// const ModalImage = styled.img`
-//  display: block;
-//  width: 100%;
-//  height: auto;
-// `;
+const ModalImage = styled.img`
+  display: block;
+  width: 100%;
+  height: 100%;
+`;
 
-export { Overlay, ModalImageBox };
+export { Overlay, ModalImageBox, ModalImage };
