@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-const ErrorMessage = styled.div`
+const ErrorMessage = styled.p`
   margin-top: 20px;
 
   text-align: center;
