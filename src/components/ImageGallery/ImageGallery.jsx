@@ -8,35 +8,42 @@ import { Greeting, ImageGalleryBox } from './ImageGallery.styled';
 import { Section } from 'components/Section/Section';
 import { Button } from 'components/Button/Button';
 
-const ImageGallery = ({ query, handleOpenModal, page, handleLoadMore }) => {
+const finiteStates = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
+
+const PERPAGE = 12;
+
+const ImageGallery = ({ query, page, handleLoadMore }) => {
   const [images, setImages] = useState([]);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState(finiteStates.IDLE);
   const [responseLength, setResponseLength] = useState(0);
-
-  const perPage = 12;
 
   useEffect(() => {
     if (!query) return;
 
     const responsResolved = newImages => {
       setImages(prevImages => [...prevImages, ...newImages]);
-      setStatus('resolved');
+      setStatus(finiteStates.RESOLVED);
       setResponseLength(newImages.length);
     };
 
     const responseRejected = error => {
       setError(error);
-      setStatus('rejected');
+      setStatus(finiteStates.REJECTED);
     };
 
     if (page === 1) {
       setImages([]);
     }
 
-    setStatus('pending');
+    setStatus(finiteStates.PENDING);
 
-    fetchImages(query, page, perPage).then(responsResolved).catch(responseRejected);
+    fetchImages(query, page, PERPAGE).then(responsResolved).catch(responseRejected);
   }, [query, page]);
 
   const mapImages = ({ id, webformatURL, largeImageURL, tags }) => (
@@ -45,21 +52,22 @@ const ImageGallery = ({ query, handleOpenModal, page, handleLoadMore }) => {
       webformatURL={webformatURL}
       largeImageURL={largeImageURL}
       tags={tags}
-      handleOpenModal={handleOpenModal}
     />
   );
 
   return (
     <Section>
-      {status === 'idle' && <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>}
+      {status === finiteStates.IDLE && (
+        <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>
+      )}
 
-      {status !== 'idle' && !!images.length && <ImageGalleryBox>{images.map(mapImages)}</ImageGalleryBox>}
+      {status !== finiteStates.IDLE && !!images.length && <ImageGalleryBox>{images.map(mapImages)}</ImageGalleryBox>}
 
-      {status === 'pending' && <Loader />}
+      {status === finiteStates.PENDING && <Loader />}
 
-      {status === 'rejected' && <Error message={error.message} />}
+      {status === finiteStates.REJECTED && <Error message={error.message} />}
 
-      {responseLength === perPage && !!images.length && <Button handleLoadMore={handleLoadMore} />}
+      {responseLength === PERPAGE && !!images.length && <Button handleLoadMore={handleLoadMore} />}
     </Section>
   );
 };
@@ -67,7 +75,6 @@ const ImageGallery = ({ query, handleOpenModal, page, handleLoadMore }) => {
 ImageGallery.propTypes = {
   query: PropTypes.string.isRequired,
   page: PropTypes.number.isRequired,
-  handleOpenModal: PropTypes.func.isRequired,
   handleLoadMore: PropTypes.func.isRequired
 }
 

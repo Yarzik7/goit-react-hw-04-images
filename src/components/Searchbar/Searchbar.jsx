@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BsSearch } from 'react-icons/bs';
@@ -12,7 +13,7 @@ const Searchbar = ({ onSubmit }) => {
     event.preventDefault();
 
     if (!query.trim()) {
-      toast.error('Введіть тему картинок');
+      toast.info('Enter a picture theme!');
       return;
     }
 
@@ -43,53 +44,8 @@ const Searchbar = ({ onSubmit }) => {
   );
 };
 
-// class Searchbar extends Component {
-//   state = {
-//     query: '',
-//   };
-
-//   handleQueryChange = ({ currentTarget: { name, value } }) => {
-//     this.setState({ [name]: value });
-//   };
-
-//   handleSubmit = event => {
-//     event.preventDefault();
-
-//     if (!this.state.query.trim()) {
-//       toast.error('Введіть тему картинок');
-//       return;
-//     }
-
-//     this.props.onSubmit(this.state.query);
-
-//     this.setState({ query: '' });
-//   };
-
-//   render() {
-//     const { query } = this.state;
-
-//     return (
-//       <SearchBar>
-//         <SearchForm onSubmit={this.handleSubmit}>
-//           <SearchFormButton type="submit">
-//             <SearchFormButtonLabel>Search</SearchFormButtonLabel>
-//             <BsSearch width={40} height={40}/>
-//           </SearchFormButton>
-
-//           <SearchFormInput
-//             className="input"
-//             type="text"
-//             name="query"
-//             autoComplete="off"
-//             autoFocus
-//             placeholder="Search images and photos"
-//             onChange={this.handleQueryChange}
-//             value={query}
-//           />
-//         </SearchForm>
-//       </SearchBar>
-//     );
-//   }
-// }
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
 
 export { Searchbar };
